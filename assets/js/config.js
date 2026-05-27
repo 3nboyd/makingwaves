@@ -90,6 +90,8 @@ export const DEFAULT_STATE = {
   sensitivity: 0.68,
   trail: 0.64,
   threshold: 0.52,
+  monitorEnabled: false,
+  monitorLevel: 0.6,
   mirror: true,
   showHud: true,
   sessionActive: false,

@@ -34,6 +34,8 @@ export class UIController {
   }
 
   updateState(state) {
+    this.elements.monitorToggle.checked = state.monitorEnabled;
+    this.elements.monitorRange.disabled = !state.monitorEnabled;
     this.elements.mirrorToggle.checked = state.mirror;
     this.elements.hudToggle.checked = state.showHud;
     this.elements.performanceHud.classList.toggle("is-hidden", !state.showHud);
@@ -58,6 +60,16 @@ export class UIController {
   }
 
   updateAudio(metrics) {
+    this.elements.masterFill.style.width = formatPercent(metrics.level);
+    this.elements.masterReadout.textContent = formatPercent(metrics.level);
+    this.elements.masterDbReadout.textContent =
+      Number.isFinite(metrics.inputDb) ? `${metrics.inputDb} dB` : "-inf dB";
+    this.elements.signalStateLabel.textContent = metrics.signalDetected ? "Signal live" : "No signal";
+    this.elements.signalStateCopy.textContent = metrics.signalDetected
+      ? "Input is active. Your routed audio is reaching the browser."
+      : "Waiting for routed audio. Check the virtual cable or interface output.";
+    this.elements.signalStatePill.classList.toggle("signal-pill-live", metrics.signalDetected);
+    this.elements.signalStatePill.classList.toggle("signal-pill-idle", !metrics.signalDetected);
     this.elements.levelFill.style.width = formatPercent(metrics.level);
     this.elements.bassFill.style.width = formatPercent(metrics.bass);
     this.elements.midFill.style.width = formatPercent(metrics.mid);
@@ -191,6 +203,7 @@ export class UIController {
 
   #bindRangeOutputs() {
     const pairs = [
+      [this.elements.monitorRange, this.elements.monitorValue],
       [this.elements.intensityRange, this.elements.intensityValue],
       [this.elements.sensitivityRange, this.elements.sensitivityValue],
       [this.elements.trailRange, this.elements.trailValue],
@@ -222,8 +235,11 @@ export class UIController {
       refreshDevicesButton: document.getElementById("refresh-devices"),
       videoSelect: document.getElementById("video-device"),
       audioSelect: document.getElementById("audio-device"),
+      monitorToggle: document.getElementById("monitor-toggle"),
+      monitorRange: document.getElementById("monitor-range"),
       mirrorToggle: document.getElementById("mirror-toggle"),
       hudToggle: document.getElementById("hud-toggle"),
+      monitorValue: document.getElementById("monitor-value"),
       intensityRange: document.getElementById("intensity-range"),
       sensitivityRange: document.getElementById("sensitivity-range"),
       trailRange: document.getElementById("trail-range"),
@@ -243,6 +259,12 @@ export class UIController {
       performanceHud: document.getElementById("performance-hud"),
       activeEffectLabel: document.getElementById("active-effect-label"),
       peakReadout: document.getElementById("peak-readout"),
+      masterFill: document.getElementById("master-fill"),
+      masterReadout: document.getElementById("master-readout"),
+      masterDbReadout: document.getElementById("master-db-readout"),
+      signalStateCopy: document.getElementById("signal-state-copy"),
+      signalStateLabel: document.getElementById("signal-state-label"),
+      signalStatePill: document.getElementById("signal-state-pill"),
       recordTimer: document.getElementById("record-timer"),
       hudRecording: document.querySelector(".hud-recording"),
       sessionStatus: document.getElementById("session-status"),

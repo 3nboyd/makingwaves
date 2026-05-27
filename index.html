@@ -54,6 +54,7 @@
 
         <nav id="site-nav" class="site-nav" aria-label="Primary">
           <a href="#studio">Studio</a>
+          <a href="#engine">Engine</a>
           <a href="#effects">Effects</a>
           <a href="#workflow">Workflow</a>
           <a href="#deploy">Deploy</a>
@@ -278,6 +279,20 @@
                   <select id="audio-device"></select>
                 </label>
 
+                <label class="switch">
+                  <input id="monitor-toggle" type="checkbox" />
+                  <span class="switch-ui"></span>
+                  <span>Monitor input in speakers/headphones</span>
+                </label>
+
+                <label class="range-field">
+                  <div class="range-label-row">
+                    <span>Monitor volume</span>
+                    <output id="monitor-value" for="monitor-range">60%</output>
+                  </div>
+                  <input id="monitor-range" type="range" min="0" max="100" value="60" />
+                </label>
+
                 <div class="checkbox-row">
                   <label class="switch">
                     <input id="mirror-toggle" type="checkbox" checked />
@@ -294,6 +309,10 @@
                 <p class="support-note">
                   For DJ software audio, choose a browser-visible virtual input such as a loopback
                   bus or routed interface channel.
+                </p>
+                <p class="support-note">
+                  Use input monitoring only for testing, preferably on headphones, so the booth
+                  speakers do not feed back into the capture chain.
                 </p>
               </section>
 
@@ -345,6 +364,26 @@
               <section class="surface-card control-card diagnostics-card">
                 <div class="card-topline">
                   <span class="eyebrow eyebrow-small">Signal Test</span>
+                </div>
+
+                <div class="signal-primary">
+                  <div class="signal-copy">
+                    <span class="signal-kicker">Master input check</span>
+                    <strong id="master-readout">0%</strong>
+                    <p id="signal-state-copy">Waiting for routed audio.</p>
+                  </div>
+                  <div id="signal-state-pill" class="signal-pill signal-pill-idle">
+                    <span class="signal-pill-dot" aria-hidden="true"></span>
+                    <strong id="signal-state-label">No signal</strong>
+                  </div>
+                </div>
+
+                <div class="meter-row meter-row-primary">
+                  <span>Master In</span>
+                  <div class="meter-track meter-track-primary">
+                    <span id="master-fill" class="meter-fill meter-fill-primary"></span>
+                  </div>
+                  <strong id="master-db-readout">-inf dB</strong>
                 </div>
 
                 <canvas id="signal-canvas" class="signal-canvas" aria-label="Audio signal preview"></canvas>
@@ -400,6 +439,59 @@
                 </div>
               </section>
             </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="engine" class="engine-section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Engine</span>
+            <h2>How the visualizer reads the room.</h2>
+            <p>
+              Under the hood, the site runs a small real-time pipeline in the browser. It is not
+              sending your video or audio to a server. Everything happens locally on the device
+              that is running the page.
+            </p>
+          </div>
+
+          <div class="engine-grid">
+            <article class="surface-card engine-card">
+              <span class="workflow-index">01</span>
+              <h3>Camera frame intake</h3>
+              <p>
+                The selected webcam feeds a hidden source video. Each animation frame is cropped,
+                mirrored if needed, and copied into an offscreen canvas so the renderer can use it
+                without exposing raw webcam footage on stage.
+              </p>
+            </article>
+            <article class="surface-card engine-card">
+              <span class="workflow-index">02</span>
+              <h3>Audio analysis</h3>
+              <p>
+                The routed DJ input is passed through the Web Audio analyser. The engine measures
+                overall level, bass, mids, treble, waveform energy, and short transient rises so
+                effects can react to kicks, peaks, and breakdowns.
+              </p>
+            </article>
+            <article class="surface-card engine-card">
+              <span class="workflow-index">03</span>
+              <h3>Pose and silhouette tracking</h3>
+              <p>
+                MediaPipe Pose Landmarker estimates body landmarks and a segmentation mask. That
+                gives the renderer wrists, shoulders, torso center, motion amount, and a body
+                silhouette for bloom, trails, and performer-linked particles.
+              </p>
+            </article>
+            <article class="surface-card engine-card">
+              <span class="workflow-index">04</span>
+              <h3>Effect compositor and output</h3>
+              <p>
+                The active effect combines the camera frame, mask, pose data, particles, and audio
+                metrics into the stage canvas. Fullscreen uses that canvas directly, and recording
+                captures the rendered canvas plus the selected audio input.
+              </p>
+            </article>
           </div>
         </div>
       </section>
@@ -506,6 +598,7 @@
 
         <div class="footer-links">
           <a href="#studio">Studio</a>
+          <a href="#engine">Engine</a>
           <a href="#effects">Effects</a>
           <a href="#workflow">Workflow</a>
           <a href="README.md">Setup Notes</a>

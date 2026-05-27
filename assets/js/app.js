@@ -31,7 +31,7 @@ const visualizer = new VisualizerEngine({
     ui.updateDiagnostics({
       session: state.sessionActive ? "Live" : "Idle",
       camera: state.sessionActive ? "Live" : "Offline",
-      audio: state.sessionActive ? "Live" : "Offline",
+      audio: !state.sessionActive ? "Offline" : audio.signalDetected ? "Signal" : "Waiting",
       pose: !state.sessionActive
         ? "Standby"
         : poseLoading
@@ -124,6 +124,17 @@ function bindEvents() {
     await swapAudioDevice();
   });
 
+  els.monitorToggle.addEventListener("change", (event) => {
+    state.monitorEnabled = event.target.checked;
+    audioEngine.setMonitorEnabled(state.monitorEnabled);
+    ui.updateState(state);
+  });
+
+  els.monitorRange.addEventListener("input", (event) => {
+    state.monitorLevel = clamp(Number(event.target.value) / 100, 0, 1);
+    audioEngine.setMonitorLevel(state.monitorLevel);
+  });
+
   els.mirrorToggle.addEventListener("change", (event) => {
     state.mirror = event.target.checked;
     ui.updateState(state);
@@ -185,6 +196,8 @@ async function startSession() {
     ui.els.cameraVideo.srcObject = videoStream;
     await ui.els.cameraVideo.play();
     await audioEngine.connectStream(audioStream);
+    audioEngine.setMonitorLevel(state.monitorLevel);
+    audioEngine.setMonitorEnabled(state.monitorEnabled);
 
     state.sessionActive = true;
     ui.updateState(state);
@@ -238,6 +251,8 @@ async function swapAudioDevice() {
   try {
     const stream = await mediaManager.restartAudio(state.audioDeviceId);
     await audioEngine.connectStream(stream);
+    audioEngine.setMonitorLevel(state.monitorLevel);
+    audioEngine.setMonitorEnabled(state.monitorEnabled);
   } catch (error) {
     console.error(error);
     ui.showToast("The selected audio input could not be started.");

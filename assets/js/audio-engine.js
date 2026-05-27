@@ -9,6 +9,7 @@ export class AudioEngine {
     this.analyser = null;
     this.recordDestination = null;
     this.monitorEnabled = false;
+    this.monitorLevel = 0.6;
     this.frequencyData = null;
     this.timeData = null;
     this.history = [];
@@ -37,7 +38,7 @@ export class AudioEngine {
 
     this.analyser.fftSize = 2048;
     this.analyser.smoothingTimeConstant = 0.82;
-    this.monitorGain.gain.value = this.monitorEnabled ? 0.85 : 0;
+    this.#applyMonitorSettings();
 
     this.sourceNode.connect(this.inputGain);
     this.inputGain.connect(this.analyser);
@@ -68,10 +69,20 @@ export class AudioEngine {
 
   setMonitorEnabled(enabled) {
     this.monitorEnabled = enabled;
+    this.#applyMonitorSettings();
+  }
 
-    if (this.monitorGain) {
-      this.monitorGain.gain.value = enabled ? 0.85 : 0;
+  setMonitorLevel(level) {
+    this.monitorLevel = clamp(level, 0, 1);
+    this.#applyMonitorSettings();
+  }
+
+  #applyMonitorSettings() {
+    if (!this.monitorGain) {
+      return;
     }
+
+    this.monitorGain.gain.value = this.monitorEnabled ? this.monitorLevel : 0;
   }
 
   update(sensitivity = 0.68) {
@@ -112,6 +123,9 @@ export class AudioEngine {
 
     const centroid = this.#centroid();
     const waveform = this.#downsample(this.timeData, 96).map((value) => (value - 128) / 128);
+    const peak = clamp(energy * 0.58 + this.beatPulse * 0.42, 0, 1);
+    const signalDetected = level > 0.028 || peak > 0.06 || bass > 0.05;
+    const inputDb = signalDetected ? Math.round(20 * Math.log10(Math.max(level, 0.001))) : -Infinity;
 
     this.metrics = {
       level,
@@ -125,7 +139,9 @@ export class AudioEngine {
       history: [...this.history],
       beat,
       beatPulse: this.beatPulse,
-      peak: clamp(energy * 0.58 + this.beatPulse * 0.42, 0, 1),
+      peak,
+      signalDetected,
+      inputDb,
     };
 
     return this.metrics;
@@ -200,6 +216,8 @@ export class AudioEngine {
       beat: false,
       beatPulse: 0,
       peak: 0,
+      signalDetected: false,
+      inputDb: -Infinity,
     };
   }
 }
