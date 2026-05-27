@@ -100,10 +100,10 @@ export class AudioEngine {
     const mid = this.#averageRange(0.1, 0.35);
     const treble = this.#averageRange(0.35, 0.72);
     const brilliance = this.#averageRange(0.72, 1);
-    const energy = bass * 0.58 + mid * 0.26 + treble * 0.16;
+    const energy = bass * 0.64 + mid * 0.22 + treble * 0.14;
     const rise = energy - this.previousEnergy;
     const now = performance.now();
-    const triggerThreshold = 0.14 + (1 - sensitivity) * 0.2;
+    const triggerThreshold = 0.1 + (1 - sensitivity) * 0.16;
     const beat =
       rise > triggerThreshold && energy > 0.15 && now - this.lastBeatAt > 140;
 
@@ -111,7 +111,7 @@ export class AudioEngine {
       this.lastBeatAt = now;
       this.beatPulse = 1;
     } else {
-      this.beatPulse = Math.max(0, this.beatPulse - 0.055);
+      this.beatPulse = Math.max(0, this.beatPulse - 0.04);
     }
 
     this.previousEnergy = energy;
@@ -123,7 +123,9 @@ export class AudioEngine {
 
     const centroid = this.#centroid();
     const waveform = this.#downsample(this.timeData, 96).map((value) => (value - 128) / 128);
-    const peak = clamp(energy * 0.58 + this.beatPulse * 0.42, 0, 1);
+    const transient = clamp(Math.max(0, rise) * 2.8, 0, 1);
+    const peak = clamp(energy * 0.34 + this.beatPulse * 0.62 + transient * 0.46, 0, 1);
+    const impact = clamp(level * 0.4 + bass * 0.78 + this.beatPulse * 0.82 + transient * 0.52, 0, 1);
     const signalDetected = level > 0.028 || peak > 0.06 || bass > 0.05;
     const inputDb = signalDetected ? Math.round(20 * Math.log10(Math.max(level, 0.001))) : -Infinity;
 
@@ -140,6 +142,7 @@ export class AudioEngine {
       beat,
       beatPulse: this.beatPulse,
       peak,
+      impact,
       signalDetected,
       inputDb,
     };
@@ -216,6 +219,7 @@ export class AudioEngine {
       beat: false,
       beatPulse: 0,
       peak: 0,
+      impact: 0,
       signalDetected: false,
       inputDb: -Infinity,
     };

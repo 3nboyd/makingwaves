@@ -168,23 +168,23 @@ export class VisualizerEngine {
   }
 
   #updateParticles(pose, audio, state, dt) {
-    if (audio.beat) {
+    if (audio.beat || audio.impact > 0.72) {
       const anchors = [pose.center, pose.wrists.left, pose.wrists.right, pose.shoulders].filter(Boolean);
       const effect = EFFECT_PRESETS.find((item) => item.id === state.activeEffect) ?? EFFECT_PRESETS[0];
-      const spawnCount = 10 + Math.round(state.intensity * 10);
+      const spawnCount = 14 + Math.round(state.intensity * 14 + audio.impact * 14);
 
       anchors.forEach((anchor) => {
         for (let index = 0; index < spawnCount; index += 1) {
           const angle = (Math.PI * 2 * index) / spawnCount + Math.random() * 0.24;
-          const speed = 0.02 + Math.random() * 0.12 + state.intensity * 0.08;
+          const speed = 0.05 + Math.random() * 0.18 + state.intensity * 0.12 + audio.impact * 0.14;
           this.particles.push({
             x: anchor.x,
             y: anchor.y,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed,
             alpha: 0.26 + Math.random() * 0.42,
-            size: 0.8 + Math.random() * 2.6 + audio.peak * 2.8,
-            life: 0.7 + Math.random() * 0.8,
+            size: 1.1 + Math.random() * 3.2 + audio.peak * 4.4,
+            life: 0.7 + Math.random() * 0.9 + audio.impact * 0.35,
             color: effect.accent,
           });
         }
@@ -196,11 +196,11 @@ export class VisualizerEngine {
         const drift = (0.22 + state.trail * 0.34) * dt;
         return {
           ...particle,
-          x: particle.x + particle.vx * dt * 3.8,
-          y: particle.y + particle.vy * dt * 3.8 - drift * 0.18,
-          vx: particle.vx * 0.985,
-          vy: particle.vy * 0.985,
-          alpha: particle.alpha * 0.985,
+          x: particle.x + particle.vx * dt * 4.8,
+          y: particle.y + particle.vy * dt * 4.8 - drift * 0.18,
+          vx: particle.vx * 0.982,
+          vy: particle.vy * 0.982,
+          alpha: particle.alpha * 0.982,
           life: particle.life - dt * (0.8 + state.trail),
         };
       })

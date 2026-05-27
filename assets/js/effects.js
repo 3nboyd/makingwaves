@@ -31,9 +31,14 @@ function pointToPixels(point, width, height) {
   };
 }
 
+function drive(audio, state) {
+  return clamp(audio.impact * (0.72 + state.intensity * 0.85) + audio.peak * 0.45, 0, 1.4);
+}
+
 function drawBackdrop(context, scene, primary, secondary) {
   const { width, height, audio, pose } = scene;
   const center = pointToPixels(pose.center, width, height);
+  const musicDrive = drive(audio, scene.state);
 
   const background = context.createLinearGradient(0, 0, 0, height);
   background.addColorStop(0, "#07101f");
@@ -47,10 +52,10 @@ function drawBackdrop(context, scene, primary, secondary) {
     0,
     center.x,
     center.y * 0.92,
-    width * (0.36 + audio.level * 0.2),
+    width * (0.34 + musicDrive * 0.34),
   );
-  glow.addColorStop(0, withAlpha(primary, 0.16 + audio.peak * 0.18));
-  glow.addColorStop(0.45, withAlpha(secondary, 0.08 + audio.level * 0.08));
+  glow.addColorStop(0, withAlpha(primary, 0.16 + audio.peak * 0.24 + musicDrive * 0.08));
+  glow.addColorStop(0.45, withAlpha(secondary, 0.08 + audio.level * 0.12 + musicDrive * 0.06));
   glow.addColorStop(1, "rgba(0, 0, 0, 0)");
   context.fillStyle = glow;
   context.fillRect(0, 0, width, height);
@@ -136,7 +141,8 @@ function drawSilhouetteLayer(context, scene, options = {}) {
 function drawSpectrumBars(context, scene, colorA, colorB) {
   const { audio, width, height } = scene;
   const history = audio.history;
-  const chartHeight = height * 0.18;
+  const musicDrive = drive(audio, scene.state);
+  const chartHeight = height * (0.18 + musicDrive * 0.1);
   const baseline = height - 18;
   const barWidth = width / history.length;
   const gradient = context.createLinearGradient(0, baseline - chartHeight, 0, baseline);
@@ -148,7 +154,7 @@ function drawSpectrumBars(context, scene, colorA, colorB) {
   context.fillStyle = gradient;
 
   history.forEach((value, index) => {
-    const barHeight = Math.max(4, value * chartHeight);
+    const barHeight = Math.max(4, value * chartHeight * (0.95 + musicDrive * 1.45));
     context.fillRect(index * barWidth, baseline - barHeight, Math.max(2, barWidth - 2), barHeight);
   });
 
@@ -157,6 +163,7 @@ function drawSpectrumBars(context, scene, colorA, colorB) {
 
 function drawSkeleton(context, scene, color, jointColor) {
   const { pose, width, height, audio, state } = scene;
+  const musicDrive = drive(audio, state);
 
   if (!pose.detected) {
     return;
@@ -165,8 +172,8 @@ function drawSkeleton(context, scene, color, jointColor) {
   context.save();
   context.globalCompositeOperation = "screen";
   context.strokeStyle = withAlpha(color, 0.72);
-  context.lineWidth = 1.5 + state.intensity * 2.6 + audio.beatPulse * 2.4;
-  context.shadowBlur = 24 + audio.peak * 32;
+  context.lineWidth = 1.8 + state.intensity * 3.4 + musicDrive * 4.6;
+  context.shadowBlur = 28 + musicDrive * 44;
   context.shadowColor = withAlpha(color, 0.45);
 
   pose.segments.forEach(([start, end]) => {
@@ -183,7 +190,7 @@ function drawSkeleton(context, scene, color, jointColor) {
       return;
     }
 
-    const radius = 2 + state.intensity * 4 + audio.bass * 8;
+    const radius = 2.2 + state.intensity * 4.6 + audio.bass * 10 + musicDrive * 3.8;
     context.beginPath();
     context.fillStyle = withAlpha(jointColor, 0.88);
     context.arc(landmark.x * width, landmark.y * height, radius, 0, Math.PI * 2);
@@ -195,6 +202,7 @@ function drawSkeleton(context, scene, color, jointColor) {
 
 function drawPoseHalo(context, scene, fillColor) {
   const { pose, width, height, audio } = scene;
+  const musicDrive = drive(audio, scene.state);
 
   if (!pose.detected) {
     return;
@@ -211,7 +219,7 @@ function drawPoseHalo(context, scene, fillColor) {
 
   context.save();
   context.globalCompositeOperation = "screen";
-  context.fillStyle = withAlpha(fillColor, 0.08 + audio.peak * 0.08);
+  context.fillStyle = withAlpha(fillColor, 0.08 + audio.peak * 0.12 + musicDrive * 0.08);
   context.beginPath();
   context.moveTo(leftShoulder.x * width, leftShoulder.y * height);
   context.lineTo(rightShoulder.x * width, rightShoulder.y * height);
@@ -225,19 +233,20 @@ function drawPoseHalo(context, scene, fillColor) {
 function drawEnergyRings(context, scene, color) {
   const { pose, audio, width, height, time } = scene;
   const center = pointToPixels(pose.center, width, height);
-  const baseRadius = Math.max(width, height) * (0.06 + pose.bodyScale * 0.4);
+  const musicDrive = drive(audio, scene.state);
+  const baseRadius = Math.max(width, height) * (0.06 + pose.bodyScale * 0.4 + musicDrive * 0.03);
 
   context.save();
   context.globalCompositeOperation = "screen";
-  context.strokeStyle = withAlpha(color, 0.28);
+  context.strokeStyle = withAlpha(color, 0.28 + musicDrive * 0.06);
 
-  for (let index = 0; index < 4; index += 1) {
+  for (let index = 0; index < 5; index += 1) {
     const radius =
       baseRadius +
-      index * 34 +
-      Math.sin(time * 0.0012 + index) * 8 +
-      audio.beatPulse * 18;
-    context.lineWidth = 1 + index * 0.3;
+      index * (30 + musicDrive * 18) +
+      Math.sin(time * 0.0012 + index) * (8 + musicDrive * 10) +
+      audio.beatPulse * 42;
+    context.lineWidth = 1.2 + index * 0.35 + musicDrive * 0.9;
     context.beginPath();
     context.arc(center.x, center.y, radius, 0, Math.PI * 2);
     context.stroke();
@@ -248,6 +257,7 @@ function drawEnergyRings(context, scene, color) {
 
 function drawWristComets(context, scene, color) {
   const wrists = [scene.pose.wrists.left, scene.pose.wrists.right].filter(Boolean);
+  const musicDrive = drive(scene.audio, scene.state);
 
   if (!wrists.length) {
     return;
@@ -259,12 +269,12 @@ function drawWristComets(context, scene, color) {
   wrists.forEach((wrist, index) => {
     const x = wrist.x * scene.width;
     const y = wrist.y * scene.height;
-    const gradient = context.createRadialGradient(x, y, 0, x, y, 90 + scene.audio.peak * 90);
+    const gradient = context.createRadialGradient(x, y, 0, x, y, 90 + scene.audio.peak * 120 + musicDrive * 55);
     gradient.addColorStop(0, withAlpha(color, 0.48));
     gradient.addColorStop(1, "rgba(0,0,0,0)");
     context.fillStyle = gradient;
     context.beginPath();
-    context.arc(x, y, 50 + index * 18 + scene.audio.beatPulse * 40, 0, Math.PI * 2);
+    context.arc(x, y, 58 + index * 22 + scene.audio.beatPulse * 60 + musicDrive * 24, 0, Math.PI * 2);
     context.fill();
   });
 
@@ -297,6 +307,7 @@ function drawTunnel(context, scene, primary, secondary) {
     : { x: 0.5, y: 0.5 };
   const center = pointToPixels(anchor, scene.width, scene.height);
   const maxRadius = Math.max(scene.width, scene.height) * 0.7;
+  const musicDrive = drive(scene.audio, scene.state);
 
   context.save();
   context.globalCompositeOperation = "screen";
@@ -305,11 +316,13 @@ function drawTunnel(context, scene, primary, secondary) {
     const progress = index / 18;
     const radius =
       maxRadius * progress +
-      (scene.time * 0.12 + index * 24) % 28 +
-      scene.audio.beatPulse * 24;
+      (scene.time * (0.12 + musicDrive * 0.08) + index * 24) % (28 + musicDrive * 18) +
+      scene.audio.beatPulse * 56;
     context.strokeStyle =
-      index % 2 === 0 ? withAlpha(primary, 0.32 - progress * 0.22) : withAlpha(secondary, 0.26 - progress * 0.18);
-    context.lineWidth = 1.1 + (1 - progress) * 2.3;
+      index % 2 === 0
+        ? withAlpha(primary, 0.32 - progress * 0.18 + musicDrive * 0.06)
+        : withAlpha(secondary, 0.26 - progress * 0.14 + musicDrive * 0.05);
+    context.lineWidth = 1.3 + (1 - progress) * 2.8 + musicDrive * 0.8;
     context.beginPath();
     context.ellipse(center.x, center.y, radius, radius * 0.62, 0, 0, Math.PI * 2);
     context.stroke();
@@ -324,32 +337,33 @@ function drawPrismCopies(context, scene, color) {
   }
 
   const center = pointToPixels(scene.pose.center, scene.width, scene.height);
+  const musicDrive = drive(scene.audio, scene.state);
 
   context.save();
   context.globalCompositeOperation = "screen";
 
   for (let index = 0; index < 8; index += 1) {
-    const angle = (Math.PI * 2 * index) / 8 + scene.audio.centroid * 0.6;
-    const pulse = 1 + scene.audio.beatPulse * 0.08;
+    const angle = (Math.PI * 2 * index) / 8 + scene.audio.centroid * 1.2 + musicDrive * 0.16;
+    const pulse = 1 + scene.audio.beatPulse * 0.16 + musicDrive * 0.08;
     context.save();
     context.translate(center.x, center.y);
     context.rotate(angle);
     context.scale(index % 2 === 0 ? pulse : -pulse, pulse);
-    context.globalAlpha = 0.06 + scene.audio.level * 0.07;
-    context.filter = `blur(${scene.state.trail * 8}px) saturate(1.28) hue-rotate(${index * 10}deg)`;
+    context.globalAlpha = 0.09 + scene.audio.level * 0.09 + musicDrive * 0.04;
+    context.filter = `blur(${scene.state.trail * 10 + musicDrive * 8}px) saturate(1.38) hue-rotate(${index * 16 + musicDrive * 30}deg)`;
     context.drawImage(
       scene.frameCanvas,
-      -scene.width * 0.34,
-      -scene.height * 0.36,
-      scene.width * 0.68,
-      scene.height * 0.72,
+      -scene.width * 0.37,
+      -scene.height * 0.39,
+      scene.width * 0.74,
+      scene.height * 0.78,
     );
     context.restore();
   }
 
-  context.fillStyle = withAlpha(color, 0.08);
+  context.fillStyle = withAlpha(color, 0.08 + musicDrive * 0.05);
   context.beginPath();
-  context.arc(center.x, center.y, scene.width * 0.12 + scene.audio.beatPulse * 40, 0, Math.PI * 2);
+  context.arc(center.x, center.y, scene.width * 0.12 + scene.audio.beatPulse * 64 + musicDrive * 24, 0, Math.PI * 2);
   context.fill();
   context.restore();
 }
@@ -383,13 +397,13 @@ function renderLattice(context, scene) {
   const [primary, secondary, tertiary] = PALETTES.lattice;
   drawBackdrop(context, scene, primary, secondary);
   drawTrailLayer(context, scene, {
-    opacity: 0.18 + scene.state.trail * 0.2,
-    scale: 1.004 + scene.audio.level * 0.012,
-    blur: scene.state.trail * 4,
+    opacity: 0.18 + scene.state.trail * 0.2 + scene.audio.impact * 0.1,
+    scale: 1.008 + scene.audio.impact * 0.04,
+    blur: scene.state.trail * 6 + scene.audio.impact * 6,
   });
   drawVideoLayer(context, scene, {
-    opacity: 0.08 + scene.state.intensity * 0.08,
-    blur: 4,
+    opacity: 0.08 + scene.state.intensity * 0.08 + scene.audio.impact * 0.06,
+    blur: 4 + scene.audio.impact * 5,
   });
   drawPoseHalo(context, scene, primary);
   drawSkeleton(context, scene, primary, secondary);
@@ -402,23 +416,23 @@ function renderAura(context, scene) {
   const [primary, secondary, tertiary] = PALETTES.aura;
   drawBackdrop(context, scene, primary, tertiary);
   drawVideoLayer(context, scene, {
-    opacity: 0.05 + scene.audio.level * 0.05,
-    blur: 6,
+    opacity: 0.06 + scene.audio.level * 0.07 + scene.audio.impact * 0.04,
+    blur: 8 + scene.audio.impact * 8,
     composite: "screen",
   });
   drawSilhouetteLayer(context, scene, {
-    opacity: 0.24 + scene.audio.peak * 0.16,
-    blur: 26 + scene.state.trail * 20,
-    hueRotation: scene.audio.centroid * 160,
-    scale: 1.01 + scene.audio.beatPulse * 0.02,
-    offsetX: -10 - scene.audio.beatPulse * 18,
+    opacity: 0.24 + scene.audio.peak * 0.2 + scene.audio.impact * 0.08,
+    blur: 28 + scene.state.trail * 24 + scene.audio.impact * 18,
+    hueRotation: scene.audio.centroid * 220 + scene.audio.impact * 35,
+    scale: 1.02 + scene.audio.beatPulse * 0.04 + scene.audio.impact * 0.02,
+    offsetX: -12 - scene.audio.beatPulse * 34 - scene.audio.impact * 14,
   });
   drawSilhouetteLayer(context, scene, {
-    opacity: 0.16 + scene.audio.level * 0.12,
-    blur: 18 + scene.state.trail * 16,
-    hueRotation: 180 + scene.audio.centroid * 90,
-    scale: 0.995,
-    offsetX: 10 + scene.audio.beatPulse * 18,
+    opacity: 0.18 + scene.audio.level * 0.14 + scene.audio.impact * 0.06,
+    blur: 20 + scene.state.trail * 18 + scene.audio.impact * 16,
+    hueRotation: 180 + scene.audio.centroid * 120 + scene.audio.impact * 24,
+    scale: 0.995 + scene.audio.impact * 0.015,
+    offsetX: 10 + scene.audio.beatPulse * 30 + scene.audio.impact * 12,
   });
   drawSkeleton(context, scene, secondary, primary);
   drawEnergyRings(context, scene, tertiary);
@@ -428,15 +442,15 @@ function renderPrism(context, scene) {
   const [primary, secondary, tertiary] = PALETTES.prism;
   drawBackdrop(context, scene, primary, tertiary);
   drawTrailLayer(context, scene, {
-    opacity: 0.16 + scene.state.trail * 0.18,
-    scale: 1.012,
-    blur: 8,
-    rotation: scene.audio.centroid * 0.05,
+    opacity: 0.18 + scene.state.trail * 0.18 + scene.audio.impact * 0.08,
+    scale: 1.018 + scene.audio.impact * 0.05,
+    blur: 10 + scene.audio.impact * 10,
+    rotation: scene.audio.centroid * 0.08 + scene.audio.impact * 0.05,
   });
   drawPrismCopies(context, scene, primary);
   drawVideoLayer(context, scene, {
-    opacity: 0.06 + scene.audio.level * 0.05,
-    blur: 2,
+    opacity: 0.07 + scene.audio.level * 0.07 + scene.audio.impact * 0.04,
+    blur: 3 + scene.audio.impact * 4,
     composite: "lighter",
   });
   drawSkeleton(context, scene, secondary, tertiary);
@@ -447,9 +461,9 @@ function renderTunnelEffect(context, scene) {
   const [primary, secondary] = PALETTES.tunnel;
   drawBackdrop(context, scene, primary, secondary);
   drawTrailLayer(context, scene, {
-    opacity: 0.12 + scene.state.trail * 0.12,
-    scale: 1.01,
-    blur: 5,
+    opacity: 0.14 + scene.state.trail * 0.14 + scene.audio.impact * 0.08,
+    scale: 1.014 + scene.audio.impact * 0.05,
+    blur: 6 + scene.audio.impact * 8,
     composite: "lighter",
   });
   drawTunnel(context, scene, primary, secondary);
@@ -462,20 +476,20 @@ function renderAfterglow(context, scene) {
   const [primary, secondary, tertiary] = PALETTES.afterglow;
   drawBackdrop(context, scene, primary, secondary);
   drawTrailLayer(context, scene, {
-    opacity: 0.2 + scene.state.trail * 0.26,
-    scale: 1.008,
-    blur: 10,
+    opacity: 0.22 + scene.state.trail * 0.26 + scene.audio.impact * 0.08,
+    scale: 1.014 + scene.audio.impact * 0.05,
+    blur: 12 + scene.audio.impact * 10,
     composite: "screen",
   });
   drawVideoLayer(context, scene, {
-    opacity: 0.06 + scene.audio.level * 0.06,
-    blur: 3,
+    opacity: 0.08 + scene.audio.level * 0.08 + scene.audio.impact * 0.04,
+    blur: 4 + scene.audio.impact * 5,
     composite: "screen",
   });
   drawSilhouetteLayer(context, scene, {
-    opacity: 0.14 + scene.audio.peak * 0.1,
-    blur: 16 + scene.state.trail * 14,
-    hueRotation: 18,
+    opacity: 0.18 + scene.audio.peak * 0.14 + scene.audio.impact * 0.08,
+    blur: 18 + scene.state.trail * 18 + scene.audio.impact * 12,
+    hueRotation: 18 + scene.audio.impact * 16,
   });
   drawParticles(context, scene);
   drawWristComets(context, scene, tertiary);
