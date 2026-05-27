@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Auralith Live is a browser-native DJ visualizer with camera input, virtual audio routing, body-reactive effects, fullscreen playback, and recording."
+    />
+    <meta name="theme-color" content="#070b16" />
+    <title>Auralith Live</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="assets/css/tokens.css" />
+    <link rel="stylesheet" href="assets/css/base.css" />
+    <link rel="stylesheet" href="assets/css/layout.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+    <link rel="stylesheet" href="assets/css/studio.css" />
+  </head>
+  <body>
+    <noscript>
+      <div class="noscript-banner">
+        Auralith Live needs JavaScript enabled for camera, audio analysis, fullscreen, and recording.
+      </div>
+    </noscript>
+
+    <div class="page-orb page-orb-a" aria-hidden="true"></div>
+    <div class="page-orb page-orb-b" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="container nav-shell">
+        <a class="brand" href="#top" aria-label="Auralith Live home">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-copy">
+            <span class="brand-name">Auralith</span>
+            <span class="brand-subtitle">Live</span>
+          </span>
+        </a>
+
+        <button
+          id="nav-toggle"
+          class="nav-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="site-nav"
+        >
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav id="site-nav" class="site-nav" aria-label="Primary">
+          <a href="#studio">Studio</a>
+          <a href="#effects">Effects</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#deploy">Deploy</a>
+          <button id="nav-launch" class="button button-primary button-compact" type="button">
+            Open Live Rig
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero-section">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow">
+              Browser-native visuals for DJ booths, club walls, and reactive stage backdrops
+            </div>
+            <h1>Body-tracked visuals driven by your camera and your DJ audio feed.</h1>
+            <p class="hero-lede">
+              Auralith Live turns a static GitHub Pages site into a fullscreen visual instrument.
+              Pick a webcam, route a virtual audio bus from Rekordbox, Serato, Traktor, Ableton,
+              or OBS, then launch reactive scenes that bloom, pulse, trail, and contour around
+              your movement.
+            </p>
+
+            <div class="hero-actions">
+              <button id="hero-launch" class="button button-primary" type="button">
+                Launch The Studio
+              </button>
+              <a class="button button-secondary" href="#workflow">See The Setup Flow</a>
+            </div>
+
+            <div class="hero-meta-grid">
+              <article class="meta-card">
+                <span class="meta-label">Hosting</span>
+                <strong>GitHub Pages safe</strong>
+                <p>Plain HTML, CSS, and JavaScript. No build step required.</p>
+              </article>
+              <article class="meta-card">
+                <span class="meta-label">Inputs</span>
+                <strong>Camera + virtual audio</strong>
+                <p>Choose webcams and audio inputs exposed by the browser.</p>
+              </article>
+              <article class="meta-card">
+                <span class="meta-label">Performance</span>
+                <strong>Fullscreen + recording</strong>
+                <p>Run the stage full screen and download your takes locally.</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="hero-preview-card surface-card">
+            <div class="preview-topline">
+              <span class="status-dot active"></span>
+              <span>Live preview architecture</span>
+            </div>
+
+            <div class="preview-scene" aria-hidden="true">
+              <div class="preview-grid"></div>
+              <div class="preview-ring preview-ring-a"></div>
+              <div class="preview-ring preview-ring-b"></div>
+              <div class="preview-avatar">
+                <span class="avatar-core"></span>
+                <span class="avatar-arm avatar-arm-left"></span>
+                <span class="avatar-arm avatar-arm-right"></span>
+                <span class="avatar-leg avatar-leg-left"></span>
+                <span class="avatar-leg avatar-leg-right"></span>
+              </div>
+              <div class="preview-bars">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+
+            <div class="preview-stack">
+              <div class="preview-row">
+                <span>Pose tracking</span>
+                <strong>33 landmarks</strong>
+              </div>
+              <div class="preview-row">
+                <span>Audio response</span>
+                <strong>Bass / mid / treble / peaks</strong>
+              </div>
+              <div class="preview-row">
+                <span>Performance controls</span>
+                <strong>Fullscreen, wake lock, recording</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Why This Direction</span>
+            <h2>Built like a live instrument, not a demo toy.</h2>
+            <p>
+              The site keeps the UX polished for prep mode, then shifts into a minimal stage
+              surface when it is time to perform.
+            </p>
+          </div>
+
+          <div class="feature-grid">
+            <article class="surface-card feature-card">
+              <div class="feature-icon glow-cyan"></div>
+              <h3>Camera-first performance</h3>
+              <p>
+                Hidden source video feeds a rendered stage canvas so the output can stay cinematic,
+                abstract, mirrored, or silhouette-based instead of looking like raw webcam footage.
+              </p>
+            </article>
+            <article class="surface-card feature-card">
+              <div class="feature-icon glow-mint"></div>
+              <h3>Audio-reactive scene logic</h3>
+              <p>
+                Browser-native analysis breaks the input into energy bands, pulse envelopes, and
+                transient peaks that can drive trails, flares, geometry, and body-linked bursts.
+              </p>
+            </article>
+            <article class="surface-card feature-card">
+              <div class="feature-icon glow-amber"></div>
+              <h3>Static-hosting discipline</h3>
+              <p>
+                There is no backend, no database, no API key, and no GitHub Pages routing trap. If
+                the browser can access a secure page, the rig can run.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="studio" class="studio-section">
+        <div class="container">
+          <div class="section-heading section-heading-wide">
+            <span class="eyebrow">Live Studio</span>
+            <h2>Prep inputs, test the signal, then take the stage.</h2>
+            <p>
+              Start the session to request camera and audio permissions. After permissions are
+              granted, you can swap webcams, pick a virtual audio bus from your DJ software, tune
+              the response, go fullscreen, keep the display awake, and record locally.
+            </p>
+          </div>
+
+          <div class="studio-grid">
+            <section class="surface-card stage-card">
+              <div class="stage-toolbar">
+                <div class="toolbar-group">
+                  <button id="start-session" class="button button-primary" type="button">
+                    Start Session
+                  </button>
+                  <button id="stop-session" class="button button-ghost" type="button">
+                    Stop
+                  </button>
+                </div>
+
+                <div class="toolbar-group">
+                  <button id="fullscreen-toggle" class="button button-secondary" type="button">
+                    Fullscreen
+                  </button>
+                  <button id="wake-lock-toggle" class="button button-ghost" type="button">
+                    Keep Awake
+                  </button>
+                  <button id="record-toggle" class="button button-record" type="button">
+                    Record
+                  </button>
+                </div>
+              </div>
+
+              <div id="stage-shell" class="stage-shell">
+                <canvas id="visualizer-canvas" aria-label="Reactive stage visualizer"></canvas>
+                <video id="camera-source" class="hidden-video" autoplay muted playsinline></video>
+
+                <div id="stage-overlay" class="stage-overlay">
+                  <div class="overlay-badge">
+                    <span class="status-dot"></span>
+                    <span id="overlay-status-copy">Awaiting camera and audio access</span>
+                  </div>
+                  <h3>Visual stage output</h3>
+                  <p>
+                    Use this surface for booth backgrounds, projector walls, rehearsal capture, or
+                    a full-screen second display behind the decks.
+                  </p>
+                </div>
+
+                <div id="performance-hud" class="performance-hud">
+                  <div class="hud-pill">
+                    <span class="hud-label">Effect</span>
+                    <strong id="active-effect-label">Aurora Lattice</strong>
+                  </div>
+                  <div class="hud-pill">
+                    <span class="hud-label">Signal</span>
+                    <strong id="peak-readout">0%</strong>
+                  </div>
+                  <div class="hud-pill hud-recording">
+                    <span class="record-led" aria-hidden="true"></span>
+                    <strong id="record-timer">00:00</strong>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <aside class="control-column">
+              <section class="surface-card control-card">
+                <div class="card-topline">
+                  <span class="eyebrow eyebrow-small">Rig Inputs</span>
+                  <button id="refresh-devices" class="mini-link" type="button">Refresh</button>
+                </div>
+
+                <label class="field">
+                  <span>Camera source</span>
+                  <select id="video-device"></select>
+                </label>
+
+                <label class="field">
+                  <span>Audio source</span>
+                  <select id="audio-device"></select>
+                </label>
+
+                <div class="checkbox-row">
+                  <label class="switch">
+                    <input id="mirror-toggle" type="checkbox" checked />
+                    <span class="switch-ui"></span>
+                    <span>Mirror camera</span>
+                  </label>
+                  <label class="switch">
+                    <input id="hud-toggle" type="checkbox" checked />
+                    <span class="switch-ui"></span>
+                    <span>Show HUD</span>
+                  </label>
+                </div>
+
+                <p class="support-note">
+                  For DJ software audio, choose a browser-visible virtual input such as a loopback
+                  bus or routed interface channel.
+                </p>
+              </section>
+
+              <section class="surface-card control-card">
+                <div class="card-topline">
+                  <span class="eyebrow eyebrow-small">Visual Modes</span>
+                </div>
+                <div id="effect-picker" class="effect-picker" role="listbox" aria-label="Effects"></div>
+              </section>
+
+              <section class="surface-card control-card">
+                <div class="card-topline">
+                  <span class="eyebrow eyebrow-small">Response Tuning</span>
+                </div>
+
+                <label class="range-field">
+                  <div class="range-label-row">
+                    <span>Intensity</span>
+                    <output id="intensity-value" for="intensity-range">72%</output>
+                  </div>
+                  <input id="intensity-range" type="range" min="0" max="100" value="72" />
+                </label>
+
+                <label class="range-field">
+                  <div class="range-label-row">
+                    <span>Audio sensitivity</span>
+                    <output id="sensitivity-value" for="sensitivity-range">68%</output>
+                  </div>
+                  <input id="sensitivity-range" type="range" min="0" max="100" value="68" />
+                </label>
+
+                <label class="range-field">
+                  <div class="range-label-row">
+                    <span>Trail persistence</span>
+                    <output id="trail-value" for="trail-range">64%</output>
+                  </div>
+                  <input id="trail-range" type="range" min="0" max="100" value="64" />
+                </label>
+
+                <label class="range-field">
+                  <div class="range-label-row">
+                    <span>Mask threshold</span>
+                    <output id="threshold-value" for="threshold-range">52%</output>
+                  </div>
+                  <input id="threshold-range" type="range" min="0" max="100" value="52" />
+                </label>
+              </section>
+
+              <section class="surface-card control-card diagnostics-card">
+                <div class="card-topline">
+                  <span class="eyebrow eyebrow-small">Signal Test</span>
+                </div>
+
+                <canvas id="signal-canvas" class="signal-canvas" aria-label="Audio signal preview"></canvas>
+
+                <div class="meter-stack">
+                  <div class="meter-row">
+                    <span>Level</span>
+                    <div class="meter-track"><span id="level-fill" class="meter-fill"></span></div>
+                    <strong id="level-readout">0%</strong>
+                  </div>
+                  <div class="meter-row">
+                    <span>Bass</span>
+                    <div class="meter-track"><span id="bass-fill" class="meter-fill"></span></div>
+                    <strong id="bass-readout">0%</strong>
+                  </div>
+                  <div class="meter-row">
+                    <span>Mid</span>
+                    <div class="meter-track"><span id="mid-fill" class="meter-fill"></span></div>
+                    <strong id="mid-readout">0%</strong>
+                  </div>
+                  <div class="meter-row">
+                    <span>Treble</span>
+                    <div class="meter-track"><span id="treble-fill" class="meter-fill"></span></div>
+                    <strong id="treble-readout">0%</strong>
+                  </div>
+                </div>
+
+                <div class="diagnostics-grid">
+                  <div class="diag-pill">
+                    <span>Status</span>
+                    <strong id="session-status">Idle</strong>
+                  </div>
+                  <div class="diag-pill">
+                    <span>Camera</span>
+                    <strong id="camera-status">Offline</strong>
+                  </div>
+                  <div class="diag-pill">
+                    <span>Audio</span>
+                    <strong id="audio-status">Offline</strong>
+                  </div>
+                  <div class="diag-pill">
+                    <span>Pose</span>
+                    <strong id="pose-status">Standby</strong>
+                  </div>
+                  <div class="diag-pill">
+                    <span>FPS</span>
+                    <strong id="fps-readout">0</strong>
+                  </div>
+                  <div class="diag-pill">
+                    <span>Recording</span>
+                    <strong id="record-status">Ready</strong>
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="effects" class="library-section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Effect Library</span>
+            <h2>Five stage looks with different emotional temperatures.</h2>
+            <p>
+              Each mode is tuned for club projection, rehearsal capture, and solo performance on a
+              second display without relying on external rendering software.
+            </p>
+          </div>
+          <div id="effect-library" class="effect-library"></div>
+        </div>
+      </section>
+
+      <section id="workflow" class="workflow-section">
+        <div class="container">
+          <div class="section-heading">
+            <span class="eyebrow">Workflow</span>
+            <h2>A booth-friendly path from setup to showtime.</h2>
+            <p>
+              The site is designed so you can prep quickly in a green room, then shift to a clean
+              stage display when the set starts.
+            </p>
+          </div>
+
+          <div class="workflow-grid">
+            <article class="surface-card workflow-card">
+              <span class="workflow-index">01</span>
+              <h3>Grant secure-device access</h3>
+              <p>
+                GitHub Pages serves over HTTPS, so the browser can prompt for camera and audio
+                access. Once granted, labels and device switching become available.
+              </p>
+            </article>
+            <article class="surface-card workflow-card">
+              <span class="workflow-index">02</span>
+              <h3>Route your DJ master bus</h3>
+              <p>
+                Feed the browser from a loopback channel, virtual interface, or routed audio bus so
+                the visuals react to the same signal the audience hears.
+              </p>
+            </article>
+            <article class="surface-card workflow-card">
+              <span class="workflow-index">03</span>
+              <h3>Tune the response live</h3>
+              <p>
+                Adjust effect intensity, trail decay, audio sensitivity, and segmentation threshold
+                until the body effects feel tight rather than noisy.
+              </p>
+            </article>
+            <article class="surface-card workflow-card">
+              <span class="workflow-index">04</span>
+              <h3>Go fullscreen and capture</h3>
+              <p>
+                Use fullscreen for the stage wall, enable wake lock where supported, and record the
+                rendered canvas plus selected audio input straight from the browser.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="deploy" class="cta-section">
+        <div class="container">
+          <div class="cta-card surface-card">
+            <div>
+              <span class="eyebrow">Deploy Directly</span>
+              <h2>Drop the repo onto GitHub Pages and perform from a secure static URL.</h2>
+            </div>
+            <div class="cta-copy">
+              <p>
+                There is no backend dependency to provision. Push the files, enable Pages, and use
+                the published HTTPS URL for input permissions, fullscreen visuals, and local
+                recording.
+              </p>
+              <button id="cta-launch" class="button button-primary" type="button">
+                Jump Back To The Studio
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand brand-footer" href="#top">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-copy">
+              <span class="brand-name">Auralith</span>
+              <span class="brand-subtitle">Live</span>
+            </span>
+          </a>
+          <p class="footer-copy">
+            Static, performant, and stage-ready. Built for DJs who want browser-native visuals
+            without dragging a backend into the booth.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <a href="#studio">Studio</a>
+          <a href="#effects">Effects</a>
+          <a href="#workflow">Workflow</a>
+          <a href="README.md">Setup Notes</a>
+        </div>
+      </div>
+    </footer>
+
+    <div id="app-toast" class="app-toast" aria-live="polite"></div>
+    <script type="module" src="assets/js/app.js"></script>
+  </body>
+</html>

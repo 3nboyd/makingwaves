@@ -1,0 +1,156 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 14px 0;
+  backdrop-filter: blur(18px);
+  background: linear-gradient(180deg, rgba(7, 11, 22, 0.82), rgba(7, 11, 22, 0.28));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.nav-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.site-nav {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 16px;
+  left: 16px;
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(8, 13, 24, 0.92);
+  box-shadow: var(--shadow-md);
+}
+
+.site-nav.is-open {
+  display: flex;
+}
+
+.hero-section,
+.feature-section,
+.studio-section,
+.library-section,
+.workflow-section,
+.cta-section {
+  padding: 72px 0;
+}
+
+.hero-grid {
+  display: grid;
+  gap: 1.4rem;
+}
+
+.hero-copy,
+.hero-preview-card {
+  min-width: 0;
+}
+
+.feature-grid,
+.workflow-grid,
+.footer-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.studio-grid {
+  display: grid;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.control-column {
+  display: grid;
+  gap: 1rem;
+}
+
+.library-section .effect-library {
+  display: grid;
+  gap: 1rem;
+}
+
+.cta-card {
+  display: grid;
+  gap: 1.2rem;
+  padding: 1.5rem;
+}
+
+.site-footer {
+  padding: 0 0 3rem;
+}
+
+@media (min-width: 768px) {
+  .hero-section,
+  .feature-section,
+  .studio-section,
+  .library-section,
+  .workflow-section,
+  .cta-section {
+    padding: 96px 0;
+  }
+
+  .feature-grid,
+  .workflow-grid,
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .library-section .effect-library {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cta-card {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1080px) {
+  .site-nav {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.1rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .hero-grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .studio-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(330px, 0.75fr);
+    gap: 1.4rem;
+  }
+
+  .library-section .effect-library {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .workflow-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cta-card,
+  .footer-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+    align-items: center;
+  }
+}
