@@ -1,6 +1,6 @@
 # Auralith Live
 
-Static browser-native DJ visualizer built for GitHub Pages.
+Auralith Live is the DJ visualizer in the `makingwaves` repository. It runs directly in the browser and can be hosted on GitHub Pages.
 
 ## What it does
 
