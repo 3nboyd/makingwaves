@@ -32,5 +32,9 @@ No backend, database, build step, or API keys are required.
 Any static file server works. For example:
 
 ```bash
-python3 -m http.server
+git clone https://github.com/3nboyd/makingwaves.git
+cd makingwaves
+python3 -m http.server 8000
 ```
+
+Open [localhost:8000](http://localhost:8000), then choose your camera and audio input.
