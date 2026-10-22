@@ -4,7 +4,7 @@ Auralith Live is the DJ visualizer in the `makingwaves` repository. It runs dire
 
 ## What it does
 
-- Requests camera and audio input with `getUserMedia()`
+- Requests permission to use your camera and audio input
 - Lets you choose a webcam and browser-visible audio input
 - Reacts to audio energy, peaks, and frequency bands
 - Tracks body pose in the browser with MediaPipe Pose Landmarker
@@ -24,8 +24,8 @@ No backend, database, build step, or API keys are required.
 
 - GitHub Pages is compatible because the site is plain HTML, CSS, and JavaScript.
 - Device access requires a secure context. GitHub Pages provides HTTPS, so browser permissions work there.
-- For DJ software audio, route your master bus into a browser-visible virtual input or loopback device.
-- Pose tracking uses the MediaPipe web runtime and model hosted from public CDN/storage endpoints.
+- To react to DJ software audio, send its master output through a virtual audio or loopback device, then select that device as the browser audio input.
+- Pose tracking downloads the MediaPipe software and model from public hosting services, so that feature needs an internet connection.
 
 ## Local testing
 
